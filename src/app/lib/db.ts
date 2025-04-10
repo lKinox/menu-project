@@ -1,12 +1,16 @@
+import dotenv from 'dotenv';
+
+dotenv.config(); // Cargar .env en process.env
+
 import { createPool } from 'mysql2/promise';
 
 // Crea la conexión a la base de datos
 const pool = createPool({
-  host: 'mysql-136e5286-reyanjimenez-07ba.b.aivencloud.com',
-  port: 25813,   // Cambia según tu configuración
-  user: 'avnadmin',      // Tu usuario de MySQL
-  password: 'AVNS_TjxCpgqcXGfcJ8UwhSZ', // Tu contraseña de MySQL
-  database: 'defaultdb', // Tu base de datos
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT), // Asegúrate de convertir a número
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 // Crear la tabla si no existe
