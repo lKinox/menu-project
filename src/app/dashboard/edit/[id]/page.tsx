@@ -20,7 +20,7 @@ const ProductForm: React.FC = () => {
   const [name, setName] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [price, setPrice] = useState<number | string>('');
-  const [img, setImg] = useState<string>('');
+  const [img, setImg] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
@@ -79,7 +79,7 @@ const ProductForm: React.FC = () => {
         setName('');
         setDescription('');
         setPrice('');
-        setImg('');
+        setImg(null);
         setImagePreview(''); // Limpiar la vista previa
       } else {
         console.error('Error al enviar el formulario:', response.statusText);
