@@ -40,6 +40,8 @@ const ProductForm: React.FC = () => {
 
       if (response.ok) {
         console.log('Producto añadido con éxito');
+
+        router.push('/dashboard');
         // Limpiar el formulario
         setName('');
         setDescription('');
@@ -169,7 +171,7 @@ const ProductForm: React.FC = () => {
                             </div>
                         </div>
                         <div className="flex justify-end gap-3 pt-4">
-                          <Button type="button" variant="outline" onClick={() => router.push("/")}>
+                          <Button type="button" variant="outline" onClick={() => router.push("/dashboard")}>
                             Cancelar
                           </Button>
                           <Button type="submit" disabled={isSubmitting}>
