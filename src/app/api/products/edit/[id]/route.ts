@@ -1,28 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { getIdProduct, putIdProduct, deleteProductById } from '@/app/lib/db';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-
-// Configurar multer para guardar archivos
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = path.join(process.cwd(), 'public/products');
-    
-    // Asegúrate de que la carpeta exista
-    if (!fs.existsSync(dir)){
-      fs.mkdirSync(dir);
-    }
-    
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    // Usa el ID del producto como nombre de archivo
-    cb(null, `${req.body.id}.jpg`); // Cambiar .jpg según el tipo de imagen
-  },
-});
-
-const upload = multer({ storage });
+import { put } from '@vercel/blob';
 
 export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -31,17 +9,23 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
   const name = formData.get('name') as string;
   const description = formData.get('description') as string;
   const price = parseFloat(formData.get('price') as string);
-  const img = formData.get('img') as File; // Obtén la imagen del FormData
+  const file = formData.get('img') as File;
   const id = params.id; // Asegúrate de obtener el ID de los parámetros de la ruta
 
   try {
-    await putIdProduct(name, description, price, id);
+    const filename = `${name.replace(/\s+/g, '-')}-${Date.now()}.jpg`; // genera un nombre de archivo único
 
-    if (img) {
-      const buffer = Buffer.from(await img.arrayBuffer());
-      const filePath = path.join(process.cwd(), 'public/products', `${id}.jpg`); // Modifica la extensión si es necesario
-      fs.writeFileSync(filePath, buffer); // Guarda la imagen en la carpeta
-    }
+      // Usar el método put para subir la imagen al almacenamiento de blobs de Vercel
+      const blob = await put(filename, file.stream(), {
+        access: 'public',
+        addRandomSuffix: true,
+      });
+
+      const img = blob.url
+
+    await putIdProduct(name, description, price, img, id);
+
+    
 
     return NextResponse.json({ message: 'Producto actualizado con éxito' }, { status: 200 });
   } catch (error) {

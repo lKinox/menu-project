@@ -20,7 +20,7 @@ const ProductForm: React.FC = () => {
   const [name, setName] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [price, setPrice] = useState<number | string>('');
-  const [img, setImg] = useState<File | null>(null);
+  const [img, setImg] = useState<string>('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,9 +39,10 @@ const ProductForm: React.FC = () => {
             setName(product.name);
             setDescription(product.description);
             setPrice(product.price);
-            setImagePreview(`/products/${product.img}.jpg`); // Ruta de la imagen, ajusta según tu lógica
+            setImg(product.img);
+            setImagePreview(product.img); // Ruta de la imagen, ajusta según tu lógica
         
-            console.log(name, description, price); // Esto ahora debería deber deber reflejar los nuevos valores
+            console.log(name, description, price, img); // Esto ahora debería deber deber reflejar los nuevos valores
           } else {
             console.error('No se encontraron productos.');
           }
@@ -78,8 +79,8 @@ const ProductForm: React.FC = () => {
         setName('');
         setDescription('');
         setPrice('');
-        setImg(null);
-        setImagePreview(null); // Limpiar la vista previa
+        setImg('');
+        setImagePreview(''); // Limpiar la vista previa
       } else {
         console.error('Error al enviar el formulario:', response.statusText);
       }
@@ -91,17 +92,15 @@ const ProductForm: React.FC = () => {
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null; // Obtener el primer archivo o null
-  
+    const file = e.target.files?.[0] || null;
+
     if (file) {
-      setImg(file); // Guardar el archivo en el estado
-  
-      const reader = new FileReader(); // Crear un objeto FileReader
+      setImg(file); // Mantener el archivo para el envío
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string); // Establecer la vista previa de la imagen
+        setImagePreview(reader.result as string); // Establecer la vista previa a partir de la lectura del archivo
       };
-  
-      reader.readAsDataURL(file); // Leer la imagen como una URL de datos
+      reader.readAsDataURL(file);
     }
   };
 

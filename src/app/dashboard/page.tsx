@@ -31,7 +31,7 @@ interface Product {
     name: string;
     description: string;
     price: number;
-    img: number; // Suponemos que img almacena el ID del producto
+    img: string; // Suponemos que img almacena el ID del producto
   }
 
 export default function DashboardPage() {
@@ -62,6 +62,8 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchProducts();
   }, []); // El array vacío asegura que se ejecute solo una vez al montar
+
+  console.log(products)
 
   // Filtrar productos según el término de búsqueda
   const filteredProducts = products.filter(
@@ -195,7 +197,7 @@ export default function DashboardPage() {
                           <TableCell>
                             <div className="relative h-10 w-10 overflow-hidden rounded-md">
                               <Image
-                                src={`/products/${product.img}.jpg`} 
+                                src={product.img}
                                 alt={product.name}
                                 fill
                                 className="object-cover"

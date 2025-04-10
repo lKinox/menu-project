@@ -41,19 +41,13 @@ export const initializeDatabase = async () => {
 initializeDatabase();
 
 // Función para insertar un producto
-export const insertProduct = async (name: string, description: string, price: number) => {
+export const insertProduct = async (name: string, description: string, price: number, img: string) => {
   const result = await pool.execute(
-    'INSERT INTO products (name, description, price) VALUES (?, ?, ?)',
-    [name, description, price]
+    'INSERT INTO products (name, description, price, img) VALUES (?, ?, ?, ?)',
+    [name, description, price, img]
   );
   
   const insertId = (result as any)[0].insertId;
-
-  // Actualiza el campo img con el id insertado
-  await pool.execute(
-    'UPDATE products SET img = ? WHERE id = ?',
-    [insertId, insertId]
-  );
 
   return insertId; // Devuelve el ID del producto insertado
 };
@@ -69,10 +63,10 @@ export const getIdProduct = async (id: string) => {
   return rows;
 };
 
-export const putIdProduct = async (name: string, description: string, price: number, id: string) => {
+export const putIdProduct = async (name: string, description: string, price: number, img: string, id: string) => {
   const put = await pool.execute(
-    'UPDATE products SET name = ?, description = ?, price = ? WHERE id = ?',
-    [name, description, price, id]
+    'UPDATE products SET name = ?, description = ?, price = ?, img = ? WHERE id = ?',
+    [name, description, price, img, id]
   );
   return put;
 };

@@ -10,7 +10,7 @@ interface Product {
   name: string;
   description: string;
   price: number;
-  img: number; // Suponemos que img almacena el ID del producto
+  img: string; // Suponemos que img almacena el ID del producto
 }
 
 export default function LandingPage() {
@@ -64,7 +64,7 @@ export default function LandingPage() {
                 className="overflow-hidden rounded-lg bg-white shadow transition-all hover:shadow-md"
               >
                 <div className="relative h-48 w-full">
-                  <Image src={`/products/${product.img}.jpg`} alt={product.name} fill className="object-cover" />
+                  <Image src={product.img} alt={product.name} fill className="object-cover" />
                 </div>
                 <div className="p-4">
                   <h3 className="font-medium">{product.name}</h3>

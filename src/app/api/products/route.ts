@@ -1,29 +1,7 @@
 // pages/api/products/route.ts
 import { NextResponse } from 'next/server';
 import { insertProduct, getAllProducts } from '@/app/lib/db';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-
-// Configurar multer para guardar archivos
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      const dir = path.join(process.cwd(), 'public/products');
-      
-      // Asegúrate de que la carpeta exista
-      if (!fs.existsSync(dir)){
-        fs.mkdirSync(dir);
-      }
-      
-      cb(null, dir);
-    },
-    filename: (req, file, cb) => {
-      // Usa el ID del producto como nombre de archivo
-      cb(null, `${req.body.id}.jpg`); // Cambiar .jpg según el tipo de imagen
-    },
-});
-  
-const upload = multer({ storage });
+import { put } from '@vercel/blob';
   
 export async function POST(req: Request) {
     const formData = await req.formData();
@@ -31,19 +9,21 @@ export async function POST(req: Request) {
     const name = formData.get('name') as string;
     const description = formData.get('description') as string;
     const price = parseFloat(formData.get('price') as string);
+    const file = formData.get('img') as File;
   
     try {
+      const filename = `${name.replace(/\s+/g, '-')}-${Date.now()}.jpg`; // genera un nombre de archivo único
+
+      // Usar el método put para subir la imagen al almacenamiento de blobs de Vercel
+      const blob = await put(filename, file.stream(), {
+        access: 'public',
+        addRandomSuffix: true,
+      });
+
+      const img = blob.url
+
       // Primero, inserta el producto para obtener el ID
-      const insertId = await insertProduct(name, description, price);
-      
-      // Luego, actualiza el producto con la imagen
-      const file = formData.get('img') as File;
-      
-      if (file) {
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const filePath = path.join(process.cwd(), 'public/products', `${insertId}.jpg`);
-        fs.writeFileSync(filePath, buffer); // Guarda la imagen en la carpeta
-      }
+      const insertId = await insertProduct(name, description, price, img);
   
       return NextResponse.json({ id: insertId }, { status: 201 });
     } catch (error) {
