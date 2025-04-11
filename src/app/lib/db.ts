@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
 
 dotenv.config(); // Cargar .env en process.env
 
@@ -26,6 +27,31 @@ const createTable = async () => {
   `;
   await pool.execute(createTableQuery);
 };
+
+// Función para crear la tabla de usuarios
+export const createUsersTable = async () => {
+  const createUsersTableQuery = `
+    CREATE TABLE IF NOT EXISTS users (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      email VARCHAR(255) UNIQUE NOT NULL,
+      password VARCHAR(255) NOT NULL
+    )
+  `;
+
+  await pool.execute(createUsersTableQuery);
+
+  // Verifica si existen registros
+  const [rows]: any = await pool.execute('SELECT COUNT(*) AS count FROM users');
+
+  if (rows[0].count === 0) { // Solo inserta si no hay usuarios
+    const hashedPassword = await bcrypt.hash("test1234", 10); // Aquí se hash la contraseña
+    const createUserQuery = `
+      INSERT INTO users (email, password) VALUES (?, ?)
+    `;
+    await pool.execute(createUserQuery, ["test@test.com", hashedPassword]);
+  }
+};
+
 
 // Inicializar la base de datos
 export const initializeDatabase = async () => {
@@ -75,4 +101,11 @@ export const deleteProductById = async (id: string) => {
   const [result] = await pool.execute('DELETE FROM products WHERE id = ?', [id]);
   // Puedes optar por verificar el número de filas afectadas si es necesario
   return result; // Esto devolverá el resultado de la operación
+};
+
+export const getUser = async (email: string) => {
+  await createUsersTable();
+  const [result] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
+  // Puedes optar por verificar el número de filas afectadas si es necesario
+  return [result]; // Esto devolverá el resultado de la operación
 };
