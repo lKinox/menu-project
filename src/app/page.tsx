@@ -75,7 +75,7 @@ export default function LandingPage() {
           {isAuthenticated && (
             <Link
               href="/dashboard"
-              className="mb-6 inline-flex items-center text-sm font-medium text-slate-600 hover:text-slate-900"
+              className="mb-6 inline-flex items-center text-lg font-medium text-slate-600 hover:text-slate-900"
             >
               Ver el Panel de administración
             </Link>
@@ -111,44 +111,18 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="bg-slate-900 py-12 text-slate-200">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             <div>
-              <h2 className="text-xl font-bold">Nuestra Empresa</h2>
-              <p className="mt-4 text-slate-400">
+              <h2 className="text-xl text-center font-bold">Nuestra Empresa</h2>
+              <p className="mt-4 text-slate-400 text-center">
                 Ofrecemos productos de la más alta calidad desde 2010. Nuestra misión es brindar la mejor experiencia a
                 nuestros clientes.
               </p>
             </div>
 
             <div>
-              <h2 className="text-xl font-bold">Enlaces Rápidos</h2>
-              <ul className="mt-4 space-y-2">
-                <li>
-                  <Link href="#" className="text-slate-400 hover:text-white">
-                    Inicio
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-slate-400 hover:text-white">
-                    Catálogo
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-slate-400 hover:text-white">
-                    Sobre Nosotros
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-slate-400 hover:text-white">
-                    Contacto
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h2 className="text-xl font-bold">Horario</h2>
-              <ul className="mt-4 space-y-2 text-slate-400">
+              <h2 className="text-xl text-center font-bold">Horario</h2>
+              <ul className="mt-4 space-y-2 text-slate-400 text-center">
                 <li>Lunes - Viernes: 9:00 - 18:00</li>
                 <li>Sábado: 10:00 - 14:00</li>
                 <li>Domingo: Cerrado</li>
@@ -156,15 +130,15 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <h2 className="text-xl font-bold">Contacto</h2>
-              <ul className="mt-4 space-y-4">
-                <li className="flex items-center gap-3 text-slate-400">
+              <h2 className="text-xl font-bold text-center">Contacto</h2>
+              <ul className="mt-4 space-y-4 text-center">
+                <li className="flex items-center flex justify-center gap-3 text-slate-400 text-center">
                   <span>Calle Principal 123, Ciudad</span>
                 </li>
-                <li className="flex items-center gap-3 text-slate-400">
+                <li className="flex items-center flex justify-center gap-3 text-slate-400">
                   <span>+34 123 456 789</span>
                 </li>
-                <li className="flex items-center gap-3 text-slate-400">
+                <li className="flex items-center flex justify-center gap-3 text-slate-400">
                   <span>info@ejemplo.com</span>
                 </li>
               </ul>

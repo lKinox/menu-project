@@ -268,7 +268,7 @@ export default function DashboardPage() {
                   <Card key={product.id}>
                     <div className="relative aspect-square overflow-hidden">
                       <Image
-                        src={`/products/${product.img}.jpg`} 
+                        src={product.img}
                         alt={product.name}
                         fill
                         className="object-cover transition-all hover:scale-105"
