@@ -102,6 +102,19 @@ export default function DashboardPage() {
     setIsDeleteDialogOpen(true)
   }
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/cookie/delete', { method: 'GET', credentials: 'include' });
+      if (response.ok) {
+        router.push('/'); // Redirige a la página principal después de cerrar sesión
+      } else {
+        console.error('Error al cerrar sesión:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error en la solicitud de cierre de sesión:', error);
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
@@ -112,8 +125,8 @@ export default function DashboardPage() {
             <Link href="/" className="text-sm text-slate-600 hover:text-slate-900">
               Ver Tienda
             </Link>
-            <Button size="sm" variant="outline">
-              Mi Cuenta
+            <Button size="sm" variant="outline" onClick={handleLogout}>
+              Salir
             </Button>
           </nav>
         </div>

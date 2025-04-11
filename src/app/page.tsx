@@ -15,6 +15,7 @@ interface Product {
 
 export default function LandingPage() {
   const [products, setProducts] = useState<Product[]>([]); // Estado para almacenar los productos
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Función para obtener productos de la API
   const fetchProducts = async () => {
@@ -36,6 +37,26 @@ export default function LandingPage() {
     fetchProducts();
   }, []); // El array vacío asegura que se ejecute solo una vez al montar
 
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      const response = await fetch('/api/cookie/get', {
+        method: 'GET',
+        credentials: 'include', // Asegúrate de enviar las cookies con la solicitud
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIsAuthenticated(data.authenticated);
+      } else {
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuthentication(); // Llama a la función para verificar la autenticación
+  }, []);
+
+  console.log(isAuthenticated);
+
   return (
     <div className="flex min-h-screen flex-col text-gray-950">
       {/* Header */}
@@ -51,12 +72,14 @@ export default function LandingPage() {
       {/* Catalog */}
       <main className="flex-1 bg-slate-50 py-12">
         <div className="container mx-auto px-4">
-          <Link
+          {isAuthenticated && (
+            <Link
               href="/dashboard"
               className="mb-6 inline-flex items-center text-sm font-medium text-slate-600 hover:text-slate-900"
             >
-              Ver el Dashboard
+              Ver el Panel de administración
             </Link>
+          )}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => (
               <div

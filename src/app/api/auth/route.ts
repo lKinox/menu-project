@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Generar un JWT para la cookie de sesión
-    const token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '12h' });
+    const token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '24h' });
 
     const response = NextResponse.json({ message: 'Inicio de sesión exitoso' });
     response.cookies.set('session', token, {
