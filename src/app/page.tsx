@@ -116,7 +116,7 @@ export default function LandingPage() {
                 className="overflow-hidden rounded-lg bg-white shadow transition-all hover:shadow-md"
               >
                 <div className="relative h-85 w-full">
-                  <Image src={product.img} alt={product.name} fill className="object-cover" />
+                  <Image src={product.img} alt={product.name} fill className="object-cover transition-all hover:scale-105" />
                 </div>
                 <div className="p-4">
                   <h3 className="font-medium">{product.name}</h3>
@@ -208,7 +208,7 @@ export default function LandingPage() {
                   src={selectedProduct.img || "/placeholder.svg"}
                   alt={selectedProduct.name}
                   fill
-                  className="object-cover md:max-w-full max-w-[200px] mx-auto" // Tamaño de imagen más pequeño en móviles
+                  className="object-cover md:max-w-full max-w-[200px] mx-auto transition-all hover:scale-105" // Tamaño de imagen más pequeño en móviles
                 />
               </div>
 
