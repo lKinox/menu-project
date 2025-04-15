@@ -34,7 +34,6 @@ const ProductForm: React.FC = () => {
         const response = await fetch(`/api/products/edit/${id}`); // Ajusta la API según tu configuración
         if (response.ok) {
           const products = await response.json(); // Esto es un array de productos
-          console.log(products); // Imprime el array completo para verificar
         
           if (products.length > 0) { // Verifica que hay al menos un producto en el array
             const product = products[0]; // Obtén el primer producto del array
@@ -72,10 +71,8 @@ const ProductForm: React.FC = () => {
     formData.append('avaible', String(isAvaible));
     if (img) {
       formData.append('img', img);
-      console.log(img)
     } else {
       formData.append('img', imagePreview || '');
-      console.log(imagePreview)
     }
 
     try {

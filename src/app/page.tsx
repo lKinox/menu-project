@@ -38,8 +38,6 @@ export default function LandingPage() {
       const response = await fetch('/api/products'); // Llama a tu API
       if (response.ok) {
         const data: Product[] = await response.json();
-
-        console.log(data)
   
         // Filtrar los productos para incluir solo los que están disponibles
         const availableProducts = data.filter(product => product.avaible);
@@ -81,15 +79,11 @@ export default function LandingPage() {
     setIsDetailsDialogOpen(true);
   };
 
-  const truncateDescription = (description: string): string => {
-    // Recortar a 50 palabras
-    const words = description.split(' ');
-    if (words.length > 50) {
-      return words.slice(0, 50).join(' ') + '...'; // Agregar "..." al final
-    }
-    
-    // Si no se alcanzan las 50 palabras, verificar caracteres
-    return description.length > 300 ? description.substring(0, 300) + '...' : description;
+  const handleRedirect = (productName: string) => {
+    const phone = '+584122532702';
+    const message = encodeURIComponent(`¡Hola! Estoy revisando tu página y quiero más detalle de tu producto: ${productName}`);
+    const url = `https://api.whatsapp.com/send?phone=${phone}&text=${message}`;
+    window.open(url, '_blank'); // Abre la URL en una nueva pestaña
   };
 
   return (
@@ -256,7 +250,7 @@ export default function LandingPage() {
                 </div>
 
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                  <Button className="flex-1 gap-2 cursor-pointer"> {/* Añadir flex-1 aquí */}
+                  <Button className="flex-1 gap-2 cursor-pointer" onClick={() => handleRedirect(selectedProduct.name)}> {/* Añadir flex-1 aquí */}
                     <ShoppingCart className="h-4 w-41" />
                     Escribir al whatsapp
                   </Button>
