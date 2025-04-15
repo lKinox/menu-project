@@ -44,7 +44,7 @@ const ProductForm: React.FC = () => {
             setPriceDiscount(product.price_discount);
             setImg(product.img);
             setImagePreview(product.img); // Ruta de la imagen, ajusta según tu lógica
-            setIsAvaible(product.avaible); // Ruta de la imagen, ajusta según tu lógica
+            setIsAvaible(Boolean(product.avaible)); // Ruta de la imagen, ajusta según tu lógica
         
             console.log(name, description, price, price_discount, img); // Esto ahora debería deber deber reflejar los nuevos valores
           } else {
@@ -69,6 +69,7 @@ const ProductForm: React.FC = () => {
     formData.append('price', String(price));
     formData.append('price_discount', String(price_discount));
     formData.append('avaible', String(isAvaible));
+
     if (img) {
       formData.append('img', img);
     } else {
@@ -119,8 +120,6 @@ const ProductForm: React.FC = () => {
 
   const handleAvaibleChange = (checked: boolean) => {
     setIsAvaible(checked);
-    console.log("Disponible:", checked); // Aquí puedes hacer algo con el nuevo estado
-    // Por ejemplo, llamar a una función para guardar el estado en tu backend
   };
 
   return (
