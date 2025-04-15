@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-
+import { Asterisk } from "lucide-react"
 import { useState } from 'react';
 
 
@@ -18,6 +18,7 @@ const ProductForm: React.FC = () => {
   const [name, setName] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [price, setPrice] = useState<number | string>('');
+  const [price_discount, setPriceDiscount] = useState<number | string>('');
   const [img, setImg] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -30,6 +31,7 @@ const ProductForm: React.FC = () => {
     formData.append('name', name);
     formData.append('description', description);
     formData.append('price', String(price));
+    formData.append('price_discount', String(price_discount));
     if (img) formData.append('img', img);
 
     try {
@@ -46,10 +48,12 @@ const ProductForm: React.FC = () => {
         setName('');
         setDescription('');
         setPrice('');
+        setPriceDiscount('');
         setImg(null);
         setImagePreview(null); // Limpiar la vista previa
       } else {
-        console.error('Error al enviar el formulario:', response.statusText);
+        const errorData = await response.json();
+        console.error('Error al enviar el formulario:', errorData.error);
       }
     } catch (error) {
       console.error('Error al enviar el formulario:', error);
@@ -98,7 +102,10 @@ const ProductForm: React.FC = () => {
                 <div className="overflow-hidden rounded-lg bg-white p-6 shadow">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
-                            <Label htmlFor="nombre">Nombre del producto *</Label>
+                            <Label htmlFor="nombre">
+                              Nombre del producto: 
+                              <Asterisk className="mr-1 h-3 w-4" color="#ff0000"/>
+                            </Label>
                             <Input
                               id="name"
                               name="name"
@@ -109,7 +116,10 @@ const ProductForm: React.FC = () => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="descripcion">Descripción *</Label>
+                            <Label htmlFor="descripcion">
+                              Descripción:
+                              <Asterisk className="mr-1 h-3 w-4" color="#ff0000"/>
+                            </Label>
                             <Textarea
                               id="description"
                               name="description"
@@ -121,7 +131,10 @@ const ProductForm: React.FC = () => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="price">Precio:</Label>
+                            <Label htmlFor="price">
+                              Precio:
+                              <Asterisk className="mr-1 h-3 w-4" color="#ff0000"/>
+                            </Label>
                             <div className="relative">
                               <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">$</span>
                               <Input
@@ -137,7 +150,27 @@ const ProductForm: React.FC = () => {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="imagen">Imagen del producto</Label>
+                            <Label htmlFor="price">
+                              Precio en descuento:
+                            </Label>
+                            <div className="relative">
+                              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">$</span>
+                              <Input
+                                id="price_discount"
+                                name="price_discount"
+                                type="text"
+                                value={price_discount}
+                                onChange={(e) => setPriceDiscount(e.target.value)}
+                                placeholder="0.00"
+                                className="pl-8"
+                              />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="imagen">
+                              Imagen del producto:
+                              <Asterisk className="mr-1 h-3 w-4" color="#ff0000"/>
+                            </Label>
                             <div className="grid gap-4 sm:grid-cols-2">
                               <div className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100">
                               

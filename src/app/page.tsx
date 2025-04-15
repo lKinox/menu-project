@@ -3,6 +3,16 @@
 import { useEffect, useState } from 'react';
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Mail, MapPin, Phone, ShoppingCart, X } from "lucide-react"
 
 // Define la interfaz para los productos
 interface Product {
@@ -10,12 +20,17 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  price_discount: number;
   img: string; // Suponemos que img almacena el ID del producto
+  avaible: number;
 }
 
 export default function LandingPage() {
   const [products, setProducts] = useState<Product[]>([]); // Estado para almacenar los productos
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
 
   // Función para obtener productos de la API
   const fetchProducts = async () => {
@@ -23,7 +38,13 @@ export default function LandingPage() {
       const response = await fetch('/api/products'); // Llama a tu API
       if (response.ok) {
         const data: Product[] = await response.json();
-        setProducts(data); // Actualiza el estado con los datos obtenidos
+
+        console.log(data)
+  
+        // Filtrar los productos para incluir solo los que están disponibles
+        const availableProducts = data.filter(product => product.avaible);
+  
+        setProducts(availableProducts); // Actualiza el estado con los productos disponibles
       } else {
         console.error('Error al obtener productos:', response.statusText);
       }
@@ -55,7 +76,21 @@ export default function LandingPage() {
     checkAuthentication(); // Llama a la función para verificar la autenticación
   }, []);
 
-  console.log(isAuthenticated);
+  const handleDetailsProduct = (product: Product) => {
+    setSelectedProduct(product);
+    setIsDetailsDialogOpen(true);
+  };
+
+  const truncateDescription = (description: string): string => {
+    // Recortar a 50 palabras
+    const words = description.split(' ');
+    if (words.length > 50) {
+      return words.slice(0, 50).join(' ') + '...'; // Agregar "..." al final
+    }
+    
+    // Si no se alcanzan las 50 palabras, verificar caracteres
+    return description.length > 300 ? description.substring(0, 300) + '...' : description;
+  };
 
   return (
     <div className="flex min-h-screen flex-col text-gray-950">
@@ -86,19 +121,37 @@ export default function LandingPage() {
                 key={product.id}
                 className="overflow-hidden rounded-lg bg-white shadow transition-all hover:shadow-md"
               >
-                <div className="relative h-48 w-full">
+                <div className="relative h-85 w-full">
                   <Image src={product.img} alt={product.name} fill className="object-cover" />
                 </div>
                 <div className="p-4">
                   <h3 className="font-medium">{product.name}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{product.description}</p>
+                  <div className="relative mt-1">
+                    <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                      {product.description}
+                    </p>
+                    {/* <div className="absolute bottom-0 left-0 h-full w-full bg-gradient-to-t from-white to-transparent to-50%"></div> */}
+                  </div>
                   <div className="mt-3 flex items-center justify-between">
-                    <span className="font-semibold">$ {product.price}</span>
+                    {product.price_discount != 0.00 ? (
+                      <>
+                        <div>
+                          <span className="font-semibold">${product.price_discount}</span> {/* Precio en descuento, opaco si no está */}
+                          <span className="font-semibold text-sm line-through text-red-600">${product.price}</span> {/* Precio normal */}
+                        </div>
+                      </>
+                    ) : (
+                      <span className="font-semibold">${product.price}</span> // Solo muestra el precio original si no hay descuento
+                    )}
                     <Link
                       href="#"
                       className="rounded-md bg-slate-900 px-3 py-1.5 text-sm text-white hover:bg-slate-800"
+                      onClick={(e) => {
+                        e.preventDefault(); // Evita que el link haga navegación.
+                        handleDetailsProduct(product); // Llama a la función pasando el producto actual.
+                      }}
                     >
-                      Ver detalles
+                      Ver Detalles
                     </Link>
                   </div>
                 </div>
@@ -150,6 +203,74 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+      
+      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+        <DialogContent className="sm:max-w-3xl">
+          {selectedProduct && (
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Columna de la imagen */}
+              <div className="relative aspect-[3/4] overflow-hidden rounded-lg w-full h-[200px] md:h-auto"> {/* Ajusta la altura para móviles */}
+                <Image
+                  src={selectedProduct.img || "/placeholder.svg"}
+                  alt={selectedProduct.name}
+                  fill
+                  className="object-cover md:max-w-full max-w-[200px] mx-auto" // Tamaño de imagen más pequeño en móviles
+                />
+              </div>
+
+              {/* Columna de los detalles */}
+              <div className="flex flex-col">
+                <DialogHeader className="mb-2">
+                  <div className="flex items-start justify-between">
+                    <DialogTitle className="text-2xl">{selectedProduct.name}</DialogTitle>
+                  </div>
+                  <DialogDescription className="mt-2 gap-2 flex items-center">
+                    {selectedProduct.price_discount ? (
+                      <>
+                      {selectedProduct.price_discount != 0.00 ? (
+                        <>
+                          <span className="text-xl font-semibold text-slate-900">${selectedProduct.price_discount}</span>
+                          <span className="text-sm font-medium text-red-500 line-through">${selectedProduct.price}</span>
+                          <span className="ml-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                            {Math.round(
+                              ((Number.parseFloat(selectedProduct.price.toString().replace("€", "")) -
+                                Number.parseFloat(selectedProduct.price_discount.toString().replace("€", ""))) /
+                                Number.parseFloat(selectedProduct.price.toString().replace("€", ""))) *
+                                100,
+                            )}
+                            % OFF
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-xl font-semibold text-slate-900">${selectedProduct.price}</span> // Solo muestra el precio original si no hay descuento
+                      )}
+                      </>
+                    ) : (
+                      <span className="text-xl font-semibold text-slate-900">{selectedProduct.price}</span>
+                    )}
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="mt-2 flex-1 overflow-auto max-h-40 md:max-h-100"> {/* Max height diferente para móvil y desktop */}
+                  <p className="text-sm leading-relaxed text-slate-600">{selectedProduct.description}</p>
+                </div>
+
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                  <Button className="flex-1 gap-2 cursor-pointer"> {/* Añadir flex-1 aquí */}
+                    <ShoppingCart className="h-4 w-41" />
+                    Escribir al whatsapp
+                  </Button>
+                  <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)} className="flex-1 cursor-pointer"> {/* Añadir flex-1 aquí */}
+                    Cerrar
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+
     </div>
   );
 }

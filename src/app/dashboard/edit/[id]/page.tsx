@@ -3,11 +3,12 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Upload } from "lucide-react"
+import { ArrowLeft, Upload, Asterisk } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Switch } from '@/components/ui/switch'
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
@@ -20,8 +21,10 @@ const ProductForm: React.FC = () => {
   const [name, setName] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [price, setPrice] = useState<number | string>('');
+  const [price_discount, setPriceDiscount] = useState<number | string>('');
   const [img, setImg] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isAvaible, setIsAvaible] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -39,10 +42,12 @@ const ProductForm: React.FC = () => {
             setName(product.name);
             setDescription(product.description);
             setPrice(product.price);
+            setPriceDiscount(product.price_discount);
             setImg(product.img);
             setImagePreview(product.img); // Ruta de la imagen, ajusta según tu lógica
+            setIsAvaible(product.avaible); // Ruta de la imagen, ajusta según tu lógica
         
-            console.log(name, description, price, img); // Esto ahora debería deber deber reflejar los nuevos valores
+            console.log(name, description, price, price_discount, img); // Esto ahora debería deber deber reflejar los nuevos valores
           } else {
             console.error('No se encontraron productos.');
           }
@@ -56,21 +61,29 @@ const ProductForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    console.log("active")
     setIsSubmitting(true); // Comienza el proceso de envío
 
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
     formData.append('price', String(price));
-    if (img) formData.append('img', img);
+    formData.append('price_discount', String(price_discount));
+    formData.append('avaible', String(isAvaible));
+    if (img) {
+      formData.append('img', img);
+      console.log(img)
+    } else {
+      formData.append('img', imagePreview || '');
+      console.log(imagePreview)
+    }
 
     try {
       const response = await fetch(`/api/products/edit/${id}`, { // Asegúrate de incluir el id en la URL
         method: 'PUT',
         body: formData,
       });
-    
+
       if (response.ok) {
         console.log('Producto actualizado con éxito');
 
@@ -79,10 +92,13 @@ const ProductForm: React.FC = () => {
         setName('');
         setDescription('');
         setPrice('');
+        setPriceDiscount('');
         setImg(null);
         setImagePreview(''); // Limpiar la vista previa
       } else {
-        console.error('Error al enviar el formulario:', response.statusText);
+        const errorData = await response.json();
+        console.log(errorData)
+        console.error('Error al enviar el formulario:', errorData.error);
       }
     } catch (error) {
       console.error('Error al enviar el formulario:', error);
@@ -102,6 +118,12 @@ const ProductForm: React.FC = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleAvaibleChange = (checked: boolean) => {
+    setIsAvaible(checked);
+    console.log("Disponible:", checked); // Aquí puedes hacer algo con el nuevo estado
+    // Por ejemplo, llamar a una función para guardar el estado en tu backend
   };
 
   return (
@@ -129,7 +151,10 @@ const ProductForm: React.FC = () => {
                 <div className="overflow-hidden rounded-lg bg-white p-6 shadow">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
-                            <Label htmlFor="nombre">Nombre del producto *</Label>
+                            <Label htmlFor="nombre">
+                              Nombre del producto: 
+                              <Asterisk className="mr-1 h-3 w-4" color="#ff0000"/>
+                            </Label>
                             <Input
                               id="name"
                               name="name"
@@ -140,7 +165,10 @@ const ProductForm: React.FC = () => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="descripcion">Descripción *</Label>
+                            <Label htmlFor="descripcion">
+                              Descripción:
+                              <Asterisk className="mr-1 h-3 w-4" color="#ff0000"/>
+                            </Label>
                             <Textarea
                               id="description"
                               name="description"
@@ -152,7 +180,10 @@ const ProductForm: React.FC = () => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="price">Precio:</Label>
+                            <Label htmlFor="price">
+                              Precio:
+                              <Asterisk className="mr-1 h-3 w-4" color="#ff0000"/>
+                            </Label>
                             <div className="relative">
                               <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">$</span>
                               <Input
@@ -168,7 +199,27 @@ const ProductForm: React.FC = () => {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="imagen">Imagen del producto</Label>
+                            <Label htmlFor="price_discount">
+                              Precio en descuento:
+                            </Label>
+                            <div className="relative">
+                              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">$</span>
+                              <Input
+                                id="price_discount"
+                                name="price_discount"
+                                type="text"
+                                value={price_discount}
+                                onChange={(e) => setPriceDiscount(e.target.value)}
+                                placeholder="0.00"
+                                className="pl-8"
+                              />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="imagen">
+                              Imagen del producto:
+                              <Asterisk className="mr-1 h-3 w-4" color="#ff0000"/>
+                            </Label>
                             <div className="grid gap-4 sm:grid-cols-2">
                               <div className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100">
                               
@@ -200,6 +251,16 @@ const ProductForm: React.FC = () => {
                                 </div>
                               )}
                             </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="avaible">
+                              Disponible:  
+                            </Label>
+                            <Switch
+                              id="avaible"
+                              checked={isAvaible}
+                              onCheckedChange={handleAvaibleChange}
+                            />
                         </div>
                         <div className="flex justify-end gap-3 pt-4">
                           <Button type="button" variant="outline" onClick={() => router.push("/dashboard")}>

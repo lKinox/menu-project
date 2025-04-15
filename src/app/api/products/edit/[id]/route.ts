@@ -1,36 +1,53 @@
+
+
 import { NextResponse, NextRequest } from 'next/server'
 import { getIdProduct, putIdProduct, deleteProductById } from '@/app/lib/db';
 import { put } from '@vercel/blob';
 
 export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  console.log('PUT request received');
+
   const params = await props.params;
   const formData = await req.formData();
+
+  console.log('formData');
 
   const name = formData.get('name') as string;
   const description = formData.get('description') as string;
   const price = parseFloat(formData.get('price') as string);
-  const file = formData.get('img') as File;
-  const id = params.id; // Asegúrate de obtener el ID de los parámetros de la ruta
+  const price_discount = parseFloat(formData.get('price_discount') as string);
+  const imgData = formData.get('img');
+  const avaible = formData.get('avaible') as string;
+  const id = await params.id; // Asegúrate de obtener el ID correctamente (ya es una promesa resuelta aquí)
+
+  let newImgUrl: string | null = null;
+  let avaible_value: number;
+
+  if (avaible === "true") {
+    avaible_value = 1;
+  } else {
+    avaible_value = 0;
+  }
 
   try {
-    const filename = `${name.replace(/\s+/g, '-')}-${Date.now()}.jpg`; // genera un nombre de archivo único
-
-      // Usar el método put para subir la imagen al almacenamiento de blobs de Vercel
-      const blob = await put(filename, file.stream(), {
+    if (imgData instanceof File) {
+      // Si imgData es un File, sube la nueva imagen
+      const filename = `${name.replace(/\s+/g, '-')}-${Date.now()}.jpg`;
+      const blob = await put(filename, imgData.stream(), {
         access: 'public',
         addRandomSuffix: true,
       });
-
-      const img = blob.url
-
-    await putIdProduct(name, description, price, img, id);
-
-    
+      newImgUrl = blob.url;
+      await putIdProduct(name, description, price, price_discount, newImgUrl, avaible_value, id);
+    } else if (typeof imgData === 'string' && imgData) {
+      // Si imgData es una cadena no vacía, usa la URL existente
+      await putIdProduct(name, description, price, price_discount, imgData as string, avaible_value, id);
+    }
 
     return NextResponse.json({ message: 'Producto actualizado con éxito' }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) { // <-- Añade el tipo 'any' para acceder a las propiedades del error
     console.error('Error al actualizar el producto:', error);
-    return NextResponse.json({ error: 'Error al actualizar el producto' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Error desconocido al actualizar el producto' }, { status: 500 });
   }
 }
 

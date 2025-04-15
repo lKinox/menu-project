@@ -22,7 +22,9 @@ const createTable = async () => {
       name VARCHAR(255) NOT NULL,
       description TEXT NOT NULL,
       price DECIMAL(10, 2) NOT NULL,
-      img INT
+      price_discount DECIMAL(10, 2),
+      img VARCHAR(255),
+      avaible BOOLEAN DEFAULT true
     )
   `;
   await pool.execute(createTableQuery);
@@ -67,10 +69,10 @@ export const initializeDatabase = async () => {
 initializeDatabase();
 
 // Función para insertar un producto
-export const insertProduct = async (name: string, description: string, price: number, img: string) => {
+export const insertProduct = async (name: string, description: string, price: number, price_discount: number, img: string) => {
   const result = await pool.execute(
-    'INSERT INTO products (name, description, price, img) VALUES (?, ?, ?, ?)',
-    [name, description, price, img]
+    'INSERT INTO products (name, description, price, price_discount, img) VALUES (?, ?, ?, ?, ?)',
+    [name, description, price, price_discount, img]
   );
   
   const insertId = (result as any)[0].insertId;
@@ -89,10 +91,11 @@ export const getIdProduct = async (id: string) => {
   return rows;
 };
 
-export const putIdProduct = async (name: string, description: string, price: number, img: string, id: string) => {
+export const putIdProduct = async (name: string, description: string, price: number, price_discount: number, img: string, avaible: number, id: string) => {
+  console.log("test")
   const put = await pool.execute(
-    'UPDATE products SET name = ?, description = ?, price = ?, img = ? WHERE id = ?',
-    [name, description, price, img, id]
+    'UPDATE products SET name = ?, description = ?, price = ?, price_discount = ?, img = ?, avaible = ? WHERE id = ?',
+    [name, description, price, price_discount, img, avaible, id]
   );
   return put;
 };
