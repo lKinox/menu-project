@@ -9,9 +9,23 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from '@/components/ui/switch'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+
+interface Category {
+  id: number;
+  name: string;
+}
 
 
 const ProductForm: React.FC = () => {
@@ -25,6 +39,8 @@ const ProductForm: React.FC = () => {
   const [img, setImg] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAvaible, setIsAvaible] = useState<boolean>(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<number | string>('');
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -45,6 +61,7 @@ const ProductForm: React.FC = () => {
             setImg(product.img);
             setImagePreview(product.img); // Ruta de la imagen, ajusta según tu lógica
             setIsAvaible(Boolean(product.avaible)); // Ruta de la imagen, ajusta según tu lógica
+            setSelectedCategory(product.category_id); // Ruta de la imagen, ajusta según tu lógica
         
             console.log(name, description, price, price_discount, img); // Esto ahora debería deber deber reflejar los nuevos valores
           } else {
@@ -60,7 +77,12 @@ const ProductForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("active")
+    
+    if (!selectedCategory) {
+      alert("Por favor, seleccione una categoría.");
+      return;
+    }
+
     setIsSubmitting(true); // Comienza el proceso de envío
 
     const formData = new FormData();
@@ -69,6 +91,7 @@ const ProductForm: React.FC = () => {
     formData.append('price', String(price));
     formData.append('price_discount', String(price_discount));
     formData.append('avaible', String(isAvaible));
+    formData.append('category_id', String(selectedCategory));
 
     if (img) {
       formData.append('img', img);
@@ -122,6 +145,24 @@ const ProductForm: React.FC = () => {
     setIsAvaible(checked);
   };
 
+  const fetchCategory = async () => {
+    try {
+      const response = await fetch('/api/category'); // Llama a tu API
+      if (response.ok) {
+        const data: Category[] = await response.json();
+        setCategories(data); // Actualiza el estado con los datos obtenidos
+      } else {
+        console.error('Error al obtener categorías:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategory();
+  }, []); // El array vacío asegura que se ejecute solo una vez al montar
+
   return (
     <div className="flex min-h-screen flex-col text-gray-950">
         {/* Header */}
@@ -174,6 +215,25 @@ const ProductForm: React.FC = () => {
                               rows={4}
                               required
                             />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="nombre">
+                              Categoría: 
+                              <Asterisk className="mr-1 h-3 w-4" color="#ff0000"/>
+                            </Label>
+                            <Select value={selectedCategory !== null ? String(selectedCategory) : undefined} onValueChange={(value) => setSelectedCategory(Number(value))}> 
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Seleccione una categoría" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                <SelectLabel>Categorías</SelectLabel>
+                                {categories.map((category) => (
+                                  <SelectItem key={category.id} value={String(category.id)}>{category.name}</SelectItem>
+                                ))}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="price">

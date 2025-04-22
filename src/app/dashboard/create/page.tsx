@@ -9,7 +9,21 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Asterisk } from "lucide-react"
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+interface Category {
+  id: number;
+  name: string;
+}
 
 
 const ProductForm: React.FC = () => {
@@ -21,17 +35,25 @@ const ProductForm: React.FC = () => {
   const [price_discount, setPriceDiscount] = useState<number | string>('');
   const [img, setImg] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setIsSubmitting(true); // Comienza el proceso de envío
 
+    if (!selectedCategory) {
+      alert("Por favor, seleccione una categoría.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
     formData.append('price', String(price));
     formData.append('price_discount', String(price_discount));
+    formData.append('category_id', String(selectedCategory));
     if (img) formData.append('img', img);
 
     try {
@@ -51,6 +73,7 @@ const ProductForm: React.FC = () => {
         setPriceDiscount('');
         setImg(null);
         setImagePreview(null); // Limpiar la vista previa
+        setSelectedCategory(null); // Limpiar la categoría seleccionada
       } else {
         const errorData = await response.json();
         console.error('Error al enviar el formulario:', errorData.error);
@@ -76,6 +99,24 @@ const ProductForm: React.FC = () => {
       reader.readAsDataURL(file); // Leer la imagen como una URL de datos
     }
   };
+
+  const fetchCategory = async () => {
+    try {
+      const response = await fetch('/api/category'); // Llama a tu API
+      if (response.ok) {
+        const data: Category[] = await response.json();
+        setCategories(data); // Actualiza el estado con los datos obtenidos
+      } else {
+        console.error('Error al obtener categorías:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategory();
+  }, []); // El array vacío asegura que se ejecute solo una vez al montar
 
   return (
     <div className="flex min-h-screen flex-col text-gray-950">
@@ -129,6 +170,25 @@ const ProductForm: React.FC = () => {
                               rows={4}
                               required
                             />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="nombre">
+                              Categoría: 
+                              <Asterisk className="mr-1 h-3 w-4" color="#ff0000"/>
+                            </Label>
+                            <Select onValueChange={(value) => setSelectedCategory(Number(value))}>
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Seleccione una categoría" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                <SelectLabel>Categorías</SelectLabel>
+                                {categories.map((category) => (
+                                  <SelectItem key={category.id} value={String(category.id)}>{category.name}</SelectItem>
+                                ))}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="price">

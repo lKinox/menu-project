@@ -10,6 +10,7 @@ export async function POST(req: Request) {
     const description = formData.get('description') as string;
     const price = parseFloat(formData.get('price') as string);
     const price_discount = parseFloat(formData.get('price_discount') as string);
+    const category_id = parseFloat(formData.get('category_id') as string);
     const file = formData.get('img') as File;
   
     try {
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
       const img = blob.url
 
       // Primero, inserta el producto para obtener el ID
-      const insertId = await insertProduct(name, description, price, price_discount, img);
+      const insertId = await insertProduct(name, description, price, price_discount, img, category_id);
   
       return NextResponse.json({ id: insertId }, { status: 201 });
     } catch (error) {

@@ -132,6 +132,26 @@ export default function DashboardPage() {
         </div>
       </header>
 
+      <div className="border-b bg-white px-3 py-3 w-full">
+          <div className="flex justify-center gap-3">
+              <Button asChild>
+                  <Link href="/dashboard">
+                      Productos
+                  </Link>
+              </Button>
+              <Button asChild>
+                  <Link href="/dashboard/category">
+                      Categorías
+                  </Link>
+              </Button>
+              <Button asChild>
+                  <Link href="/dashboard/company">
+                        Empresa
+                  </Link>
+              </Button>
+          </div>
+      </div>
+
       {/* Main Content */}
       <main className="flex-1 bg-slate-50 py-8">
         <div className="container mx-auto px-4">
