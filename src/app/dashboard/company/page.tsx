@@ -153,7 +153,7 @@ export default function CompanyPage() {
                         <Tabs defaultValue="general" className="w-full">
                             <TabsList className="grid grid-cols-4 mb-8 w-full">
                                 <TabsTrigger value="general">General</TabsTrigger>
-                                <TabsTrigger value="about">Sobre la Empresa</TabsTrigger>
+                                <TabsTrigger value="about">Empresa</TabsTrigger>
                                 <TabsTrigger value="hours">Horarios</TabsTrigger>
                                 <TabsTrigger value="contact">Contacto</TabsTrigger>
                             </TabsList>
