@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
 import {
   Dialog,
   DialogContent,
@@ -13,7 +14,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { ChevronLeft, ChevronRight, Mail, MapPin, Phone, ShoppingCart, X } from "lucide-react"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Trash, Mail, Phone, ShoppingCart, ShoppingBag, Minus, Plus, X } from "lucide-react"
+import { showToast } from "nextjs-toast-notify";
+
 
 // Define la interfaz para los productos
 interface Product {
@@ -46,6 +50,11 @@ interface Company {
   instagram: string;
 }
 
+type CartItem = {
+  product: Product
+  quantity: number
+}
+
 export default function LandingPage() {
   const [products, setProducts] = useState<Product[]>([]); // Estado para almacenar los productos
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -53,6 +62,7 @@ export default function LandingPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | string | number>('Todas');
+  const [categoryNameDialog, setCategoryNameDialog] = useState<string>('');
   const [categoryName, setCategoryName] = useState<string>('');
   const [company, setCompany] = useState<Company[]>([]);
   const [companyName, setCompanyName] = useState<string>('');
@@ -67,6 +77,9 @@ export default function LandingPage() {
   const [instagram, setInstagram] = useState<string>('');
   const [isLoaded, setIsLoaded] = useState(false);
   // const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([])
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [isAdding, setIsAdding] = useState(false);
 
 
   // Función para obtener productos de la API
@@ -197,6 +210,67 @@ export default function LandingPage() {
       getCompany();
     }, []);
 
+    useEffect(() => {
+      if (selectedProduct) {
+        const category = categories.find(cat => cat.id === selectedProduct.category_id);
+        setCategoryNameDialog(category ? category.name : 'Categoría Desconocida');
+      }
+    }, [selectedProduct, categories]); // Ejecuta cuando selectedProduct o categories cambien
+
+    const addToCart = (product: Product, quantity: number = 1) => {
+      if (isAdding) return; // Evitar operaciones si ya se está añadiendo
+      setIsAdding(true);
+      
+      setCartItems(prevItems => {
+        const existingItemIndex = prevItems.findIndex(item => item.product.id === product.id);
+        
+        if (existingItemIndex >= 0) {
+          const updatedItems = [...prevItems];
+          updatedItems[existingItemIndex].quantity += quantity;
+          return updatedItems;
+        } else {
+          return [...prevItems, { product, quantity }];
+        }
+      });
+    
+      showToast.success("¡La operación se realizó con éxito!", {
+        duration: 4000,
+        progress: true,
+        position: "top-left",
+        transition: "popUp",
+        icon: '',
+        sound: false,
+      });
+    
+      setIsAdding(false); // Volver a permitir la acción después de la operación
+    }
+
+    const removeFromCart = (productId: number) => {
+      setCartItems(prevItems => prevItems.filter(item => item.product.id !== productId))
+    }
+
+    const cartItemCount = cartItems.reduce((count, item) => count + item.quantity, 0)
+
+    const updateQuantity = (productId: number, newQuantity: number) => {
+      if (newQuantity < 1) return
+      
+      setCartItems(prevItems => 
+        prevItems.map(item => 
+          item.product.id === productId 
+            ? { ...item, quantity: newQuantity } 
+            : item
+        )
+      )
+    }
+
+    const cartTotal = cartItems.reduce((total, item) => {
+      const price = item.product.price_discount !== undefined
+        ? item.product.price_discount 
+        : item.product.price; // Usa price_discount si está disponible, de lo contrario, usa price
+      
+      return total + (price * item.quantity); // Aquí price ya es un número
+    }, 0);
+
     if (!isLoaded) {
       // Aquí puedes renderizar tu vista previa (skeleton, spinner, texto, etc.)
       return (
@@ -210,7 +284,7 @@ export default function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col text-gray-950">
       {/* Header */}
-      <header className="bg-white py-8 md:py-12">
+      <header className="bg-white py-8 md:py-12 static">
         <div className="container flex items-center flex-col mx-auto px-4">
           <div className="relative w-[250px] h-[250px] rounded-full overflow-hidden">
             <Image
@@ -226,6 +300,140 @@ export default function LandingPage() {
             {welcomeText}
           </p>
         </div>
+
+        {/* Botón del carrito */}
+        <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
+              <SheetTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="fixed bottom-5 right-5 md:absolute md:top-80 md:right-50 z-50 px-6 py-4 text-lg" // Aumentar padding y texto
+              >
+                <ShoppingBag className="h-6 w-6" /> {/* Aumentar el tamaño del icono */}
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-xs text-white">
+                    {cartItemCount}
+                  </span>
+                )}
+              </Button>
+              </SheetTrigger>
+              <SheetContent className="w-full p-[20] sm:max-w-md">
+                <SheetHeader>
+                  <SheetTitle className="flex items-center">
+                    <ShoppingCart className="mr-2 h-5 w-5" />
+                    Tu Carrito
+                  </SheetTitle>
+                </SheetHeader>
+                
+                {cartItems.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-[70vh]">
+                    <div className="rounded-full bg-slate-100 p-6 mb-4">
+                      <ShoppingBag className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <h3 className="text-lg font-medium mb-1">Tu carrito está vacío</h3>
+                    <p className="text-sm text-slate-500 text-center mb-6">
+                      Parece que aún no has añadido ningún producto a tu carrito
+                    </p>
+                    <Button onClick={() => setIsCartOpen(false)}>
+                      Continuar comprando
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col h-full">
+                    <div className="flex-1 overflow-auto py-6">
+                      <ul className="space-y-5">
+                        {cartItems.map((item) => (
+                          <li key={item.product.id} className="flex gap-4">
+                            <div className="relative h-20 w-20 overflow-hidden rounded-md border">
+                              <Image 
+                                src={item.product.img || "/placeholder.svg"} 
+                                alt={item.product.name} 
+                                fill 
+                                className="object-cover"
+                              />
+                            </div>
+                            <div className="flex flex-1 flex-col">
+                              <div className="flex justify-between">
+                                <h4 className="text-sm font-medium">{item.product.name}</h4>
+                                <button 
+                                  onClick={() => removeFromCart(item.product.id)}
+                                  className="text-slate-400 hover:text-red-500"
+                                >
+                                  <Trash className="h-4 w-4" />
+                                </button>
+                              </div>
+                              <p className="mt-1 text-sm text-slate-500 line-clamp-1">
+                                {item.product.description.substring(0, 60)}...
+                              </p>
+                              <div className="mt-2 flex items-center justify-between">
+                                <div className="flex items-center border rounded-md">
+                                  <button 
+                                    onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                                    className="px-2 py-1 text-slate-600 hover:bg-slate-100"
+                                    disabled={item.quantity <= 1}
+                                  >
+                                    <Minus className="h-3 w-3" />
+                                  </button>
+                                  <span className="px-2 py-1 text-sm">{item.quantity}</span>
+                                  <button 
+                                    onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                                    className="px-2 py-1 text-slate-600 hover:bg-slate-100"
+                                  >
+                                    <Plus className="h-3 w-3" />
+                                  </button>
+                                </div>
+                                <div className="text-sm font-medium">
+                                  {item.product.price_discount ? (
+                                    <>
+                                      <span>€{item.product.price_discount}</span>
+                                      <span className="ml-1 text-xs text-red-500 line-through">
+                                        €{item.product.price}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span>€{item.product.price}</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div className="border-t pt-6">
+                      <div className="space-y-4">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-slate-500">Subtotal</span>
+                          <span>€{cartTotal.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-slate-500">Envío</span>
+                          <span>Calculado en el checkout</span>
+                        </div>
+                        <Separator />
+                        <div className="flex justify-between font-medium">
+                          <span>Total</span>
+                          <span>€{cartTotal.toFixed(2)}</span>
+                        </div>
+                        <Button className="w-full">
+                          Proceder al pago
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="w-full" 
+                          onClick={() => setIsCartOpen(false)}
+                        >
+                          Continuar comprando
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </SheetContent>
+            </Sheet>
+
+
       </header>
 
       {/* Catalog */}
@@ -303,6 +511,16 @@ export default function LandingPage() {
                       ) : (
                         <span className="font-semibold">${product.price}</span> // Solo muestra el precio original si no hay descuento
                       )}
+                      <Button
+                        onClick={() => addToCart(product)}
+                        disabled={isAdding}
+                        size="icon"
+                        variant="outline"
+                        className="h-8 w-8"
+                        title="Añadir al carrito"
+                      >
+                        <ShoppingCart className="h-4 w-4" />
+                      </Button>
                       <Link
                         href="#"
                         className="rounded-md bg-slate-900 px-3 py-1.5 text-sm text-white hover:bg-slate-800"
@@ -443,6 +661,7 @@ export default function LandingPage() {
                   fill
                   className="object-cover md:max-w-full max-w-[200px] mx-auto transition-all hover:scale-105" // Tamaño de imagen más pequeño en móviles
                 />
+                <Badge className="absolute right-2 top-2 capitalize">{categoryNameDialog}</Badge>
               </div>
 
               {/* Columna de los detalles */}
@@ -483,8 +702,32 @@ export default function LandingPage() {
                 </div>
 
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                  <Button
+                        onClick={() => addToCart(selectedProduct)}
+                        disabled={isAdding}
+                        size="icon"
+                        variant="outline"
+                        className="h-8 w-8"
+                        title="Añadir al carrito"
+                  >
+                        <ShoppingCart className="h-4 w-4" />
+                  </ Button>
                   <Button className="flex-1 gap-2 cursor-pointer" onClick={() => handleRedirect(selectedProduct.name)}> {/* Añadir flex-1 aquí */}
-                    <ShoppingCart className="h-4 w-41" />
+                    {/*<ShoppingCart className="h-4 w-41" />*/}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-message-circle"
+                    >
+                      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+                    </svg>
                     Escribir al whatsapp
                   </Button>
                   <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)} className="flex-1 cursor-pointer"> {/* Añadir flex-1 aquí */}
