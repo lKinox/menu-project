@@ -308,11 +308,11 @@ export default function LandingPage() {
             ? item.product.price_discount
             : item.product.price;
 
-        messageDetails += `${item.product.name} - $${price} x ${item.quantity}\n`;
+        messageDetails += `\n${item.product.name} - $${price} x ${item.quantity}\n`;
       });
 
       messageDetails += `\nTotal del carrito: $${cartTotal}`;
-      messageDetails += "\n\nGracias.";
+      messageDetails += "\nGracias.";
 
       const message = encodeURIComponent(messageDetails);
       
