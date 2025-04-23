@@ -17,6 +17,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Trash, Mail, Phone, ShoppingCart, ShoppingBag, Minus, Plus, X } from "lucide-react"
 import { showToast } from "nextjs-toast-notify";
+import Cookies from 'js-cookie';
 
 
 // Define la interfaz para los productos
@@ -151,11 +152,23 @@ export default function LandingPage() {
   }, []);
 
   const handleRedirect = (productName: string) => {
-    const phone = '+584122532702';
     const message = encodeURIComponent(`¡Hola! Estoy revisando tu página y quiero más detalle de tu producto: ${productName}`);
-    const url = `https://api.whatsapp.com/send?phone=${phone}&text=${message}`;
+    const url = `https://api.whatsapp.com/send?phone=${whatsapp}&text=${message}`;
     window.open(url, '_blank'); // Abre la URL en una nueva pestaña
   };
+
+  useEffect(() => {
+    // Cargar el carrito desde la cookie al montar el componente
+    const storedCart = Cookies.get('cartItems');
+    if (storedCart) {
+      try {
+        const parsedCart = JSON.parse(storedCart) as CartItem[];
+        setCartItems(parsedCart);
+      } catch (error) {
+        Cookies.remove('cartItems');
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (selectedCategory !== 'Todas') {
@@ -227,13 +240,14 @@ export default function LandingPage() {
         if (existingItemIndex >= 0) {
           const updatedItems = [...prevItems];
           updatedItems[existingItemIndex].quantity += quantity;
+          saveCartToCookie(updatedItems);
           return updatedItems;
         } else {
           return [...prevItems, { product, quantity }];
         }
       });
     
-      showToast.success("¡La operación se realizó con éxito!", {
+      showToast.success(`${product.name} añadido al carrito`, {
         duration: 4000,
         progress: true,
         position: "top-left",
@@ -247,6 +261,8 @@ export default function LandingPage() {
 
     const removeFromCart = (productId: number) => {
       setCartItems(prevItems => prevItems.filter(item => item.product.id !== productId))
+      console.log(cartItems)
+      saveCartToCookie(cartItems);
     }
 
     const cartItemCount = cartItems.reduce((count, item) => count + item.quantity, 0)
@@ -261,15 +277,49 @@ export default function LandingPage() {
             : item
         )
       )
+      console.log(cartItems)
+      saveCartToCookie(cartItems);
     }
 
     const cartTotal = cartItems.reduce((total, item) => {
-      const price = item.product.price_discount !== undefined
-        ? item.product.price_discount 
-        : item.product.price; // Usa price_discount si está disponible, de lo contrario, usa price
-      
-      return total + (price * item.quantity); // Aquí price ya es un número
+      const price =
+        item.product.price_discount > 0
+          ? item.product.price_discount
+          : item.product.price; // Usa price_discount si es mayor que 0, sino usa price
+    
+      return total + price * item.quantity;
     }, 0);
+
+    const sentMessage = (products: CartItem[]) => {
+      let messageDetails = "¡Hola! Estoy interesado en estos productos de tu catálogo:\n";
+
+      products.forEach((item) => {
+        const price =
+          item.product.price_discount > 0
+            ? item.product.price_discount
+            : item.product.price;
+
+        messageDetails += `${item.product.name} - $${price} x ${item.quantity}\n`;
+      });
+
+      messageDetails += `\nTotal del carrito: $${cartTotal}`;
+      messageDetails += "\n\nGracias.";
+
+      const message = encodeURIComponent(messageDetails);
+      
+      const url = `https://api.whatsapp.com/send?phone=${whatsapp}&text=${message}`;
+      window.open(url, '_blank'); // Abre la URL en una nueva pestaña
+    }
+
+    const saveCartToCookie = (cartItems: CartItem[]) => {
+      try {
+        const cartItemsString = JSON.stringify(cartItems);
+        Cookies.set('cartItems', cartItemsString, { expires: 1 }); // Guarda la cookie por 7 días
+        console.log('Carrito guardado en la cookie:', cartItems);
+      } catch (error) {
+        console.error('Error al guardar el carrito en la cookie:', error);
+      }
+    };
 
     if (!isLoaded) {
       // Aquí puedes renderizar tu vista previa (skeleton, spinner, texto, etc.)
@@ -286,13 +336,13 @@ export default function LandingPage() {
       {/* Header */}
       <header className="bg-white py-8 md:py-12 static">
         <div className="container flex items-center flex-col mx-auto px-4">
-          <div className="relative w-[250px] h-[250px] rounded-full overflow-hidden">
+          <div className="relative w-[250px] h-[250px] rounded-full overflow-hidden border">
             <Image
               src={imgURL || "/placeholder-logo.png"}
               alt={companyName}
               fill
               className="object-cover transition-all hover:scale-105"
-              style={{ objectPosition: 'center' }} // Opcional: Centra la imagen dentro del círculo
+              style={{ objectPosition: 'center' }}
             />
           </div>
           <h1 className="text-center text-3xl font-bold md:text-5xl">{companyName}</h1>
@@ -307,11 +357,11 @@ export default function LandingPage() {
               <Button
                 variant="outline"
                 size="icon"
-                className="fixed bottom-5 right-5 md:absolute md:top-80 md:right-50 z-50 px-6 py-4 text-lg" // Aumentar padding y texto
+                className="fixed bottom-5 right-5 z-50 px-10 py-5 text-lg" // Aumentar padding y texto
               >
-                <ShoppingBag className="h-6 w-6" /> {/* Aumentar el tamaño del icono */}
+                <ShoppingBag /> {/* Aumentar el tamaño del icono */}
                 {cartItemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-xs text-white">
+                  <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-lime-700 text-xs text-white">
                     {cartItemCount}
                   </span>
                 )}
@@ -383,15 +433,15 @@ export default function LandingPage() {
                                   </button>
                                 </div>
                                 <div className="text-sm font-medium">
-                                  {item.product.price_discount ? (
+                                  {item.product.price_discount > 0 ? (
                                     <>
-                                      <span>€{item.product.price_discount}</span>
+                                      <span>${item.product.price_discount}</span>
                                       <span className="ml-1 text-xs text-red-500 line-through">
-                                        €{item.product.price}
+                                        ${item.product.price}
                                       </span>
                                     </>
                                   ) : (
-                                    <span>€{item.product.price}</span>
+                                    <span>${item.product.price}</span>
                                   )}
                                 </div>
                               </div>
@@ -403,20 +453,14 @@ export default function LandingPage() {
                     
                     <div className="border-t pt-6">
                       <div className="space-y-4">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-slate-500">Subtotal</span>
-                          <span>€{cartTotal.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-slate-500">Envío</span>
-                          <span>Calculado en el checkout</span>
-                        </div>
-                        <Separator />
                         <div className="flex justify-between font-medium">
                           <span>Total</span>
                           <span>€{cartTotal.toFixed(2)}</span>
                         </div>
-                        <Button className="w-full">
+                        <Button 
+                          className="w-full"
+                          onClick={() => sentMessage(cartItems)}  
+                        >
                           Proceder al pago
                         </Button>
                         <Button 
