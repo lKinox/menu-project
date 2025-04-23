@@ -260,26 +260,28 @@ export default function LandingPage() {
     }
 
     const removeFromCart = (productId: number) => {
-      setCartItems(prevItems => prevItems.filter(item => item.product.id !== productId))
-      console.log(cartItems)
-      saveCartToCookie(cartItems);
-    }
+      setCartItems(prevItems => {
+        const updatedItems = prevItems.filter(item => item.product.id !== productId);
+        saveCartToCookie(updatedItems); // Guardar en la cookie después de eliminar
+        return updatedItems;
+      });
+    };
 
     const cartItemCount = cartItems.reduce((count, item) => count + item.quantity, 0)
 
     const updateQuantity = (productId: number, newQuantity: number) => {
-      if (newQuantity < 1) return
-      
-      setCartItems(prevItems => 
-        prevItems.map(item => 
-          item.product.id === productId 
-            ? { ...item, quantity: newQuantity } 
+      if (newQuantity < 1) return;
+  
+      setCartItems(prevItems => {
+        const updatedItems = prevItems.map(item =>
+          item.product.id === productId
+            ? { ...item, quantity: newQuantity }
             : item
-        )
-      )
-      console.log(cartItems)
-      saveCartToCookie(cartItems);
-    }
+        );
+        saveCartToCookie(updatedItems); // Guardar en la cookie después de actualizar la cantidad
+        return updatedItems;
+      });
+    };
 
     const cartTotal = cartItems.reduce((total, item) => {
       const price =
