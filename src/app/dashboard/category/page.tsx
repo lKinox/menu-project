@@ -17,7 +17,7 @@ import {
     DialogHeader,
     DialogTitle,
   } from "@/components/ui/dialog"
-  import {
+import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -25,6 +25,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu"
+import { showToast } from "nextjs-toast-notify";
 
 interface Category {
     id: number;
@@ -89,6 +90,15 @@ export default function CategoryPage() {
                 setCategory('');  // Limpiar el campo de entrada
                 setIsCategoryDialogOpen(false);
                 fetchCategory();  // Recargar la lista de categorías
+
+                showToast.success('¡Categoría creada correctamente!', {
+                    duration: 4000,
+                    progress: false,
+                    position: "top-left",
+                    transition: "popUp",
+                    icon: '',
+                    sound: false,
+                });
             } else {
                 const errorData = await response.json();
                 console.error('Error al enviar el formulario:', errorData.error);
@@ -106,6 +116,15 @@ export default function CategoryPage() {
 
             if (response.ok) {
                 setCategories(categories.filter(category => category.id !== id)); // Eliminar de la lista local
+
+                showToast.success('¡Categoría eliminada correctamente!', {
+                    duration: 4000,
+                    progress: false,
+                    position: "top-left",
+                    transition: "popUp",
+                    icon: '',
+                    sound: false,
+                });
             } else {
                 console.error('Error al eliminar la categoría:', response.statusText);
             }

@@ -630,77 +630,93 @@ export default function LandingPage() {
             <div>
               <h2 className="text-xl font-bold text-center">Contacto</h2>
               <ul className="mt-4 space-y-4 text-center">
-                <li className="flex items-center flex-row justify-center gap-3 text-slate-400 text-center cursor-pointer">
-                  <Phone size={18} />
-                  <Link href={`tel:${phone}`} target="_blank">
-                    {phone}
-                  </Link>
-                </li>
-                <li className="flex items-center flex-row justify-center gap-3 text-slate-400">
-                  <Mail size={18} />
-                  <Link href={`mailto:${email}`} target="_blank">
-                    {email}
-                  </Link>
-                </li>
-                <li className="flex items-center flex-row justify-center gap-3 text-slate-400">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-facebook"
-                  >
-                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-                  </svg>
-                  <Link href={facebook} target="_blank">
-                    Facebook
-                  </Link>
-                </li>
-                <li className="flex items-center flex-row justify-center gap-3 text-slate-400">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-instagram"
-                  >
-                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-                  </svg>
-                  <Link href={instagram} target="_blank">
-                    Instagram
-                  </Link>
-                </li>
-                <li className="flex items-center flex-row justify-center gap-3 text-slate-400">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-message-circle"
-                  >
-                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
-                  </svg>
-                  <Link href={`https://wa.me/${whatsapp}`} target="_blank">
-                    Whastapp
-                  </Link>
-                </li>
+
+                {phone && (
+                  <li className="flex items-center flex-row justify-center gap-3 text-slate-400 text-center cursor-pointer">
+                    <Phone size={18} />
+                    <Link href={`tel:${phone}`} target="_blank">
+                      {phone}
+                    </Link>
+                  </li>
+                )}
+
+                {email && (
+                  <li className="flex items-center flex-row justify-center gap-3 text-slate-400">
+                    <Mail size={18} />
+                    <Link href={`mailto:${email}`} target="_blank">
+                      {email}
+                    </Link>
+                  </li>
+                )}
+
+                {facebook && (
+                  <li className="flex items-center flex-row justify-center gap-3 text-slate-400">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-facebook"
+                    >
+                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                    </svg>
+                    <Link href={facebook} target="_blank">
+                      Facebook
+                    </Link>
+                  </li>
+                )}
+
+                {instagram && (
+                  <li className="flex items-center flex-row justify-center gap-3 text-slate-400">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-instagram"
+                    >
+                      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                    </svg>
+                    <Link href={instagram} target="_blank">
+                      Instagram
+                    </Link>
+                  </li>
+                )}
+
+                {whatsapp && (
+                  <li className="flex items-center flex-row justify-center gap-3 text-slate-400">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-message-circle"
+                    >
+                      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+                    </svg>
+                    <Link href={`https://wa.me/${whatsapp}`} target="_blank">
+                      Whastapp
+                    </Link>
+                  </li>
+                )}
+
               </ul>
             </div>
           </div>

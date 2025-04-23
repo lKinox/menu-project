@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Edit, MoreVertical, Plus, Search, Trash } from "lucide-react"
+import { showToast } from "nextjs-toast-notify";
 
 interface Product {
     id: number;
@@ -83,6 +84,14 @@ export default function DashboardPage() {
         if (response.ok) {
           // Actualizar el estado local para eliminar el producto de la lista
           setProducts(products.filter((product) => product.id !== productToDelete));
+          showToast.success('¡Producto eliminado correctamente!', {
+            duration: 4000,
+            progress: false,
+            position: "top-left",
+            transition: "popUp",
+            icon: '',
+            sound: false,
+          });
           console.log('Producto eliminado con éxito');
         } else {
           console.error('Error al eliminar el producto:', response.statusText);

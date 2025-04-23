@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { showToast } from "nextjs-toast-notify";
 
 interface Category {
   id: number;
@@ -74,6 +75,15 @@ const ProductForm: React.FC = () => {
         setImg(null);
         setImagePreview(null); // Limpiar la vista previa
         setSelectedCategory(null); // Limpiar la categoría seleccionada
+
+        showToast.success('¡Producto creado correctamente!', {
+          duration: 4000,
+          progress: false,
+          position: "top-left",
+          transition: "popUp",
+          icon: '',
+          sound: false,
+        });
       } else {
         const errorData = await response.json();
         console.error('Error al enviar el formulario:', errorData.error);

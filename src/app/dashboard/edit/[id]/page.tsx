@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { showToast } from "nextjs-toast-notify";
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
@@ -116,6 +117,15 @@ const ProductForm: React.FC = () => {
         setPriceDiscount('');
         setImg(null);
         setImagePreview(''); // Limpiar la vista previa
+
+        showToast.success('¡Producto editado correctamente!', {
+          duration: 4000,
+          progress: false,
+          position: "top-left",
+          transition: "popUp",
+          icon: '',
+          sound: false,
+        });
       } else {
         const errorData = await response.json();
         console.log(errorData)

@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { LogoUpload } from "./logo-upload"
 import { Separator } from "@/components/ui/separator"
+import { showToast } from "nextjs-toast-notify";
 
 
 export default function CompanyPage() {
@@ -99,6 +100,16 @@ export default function CompanyPage() {
 
         if (response.ok) {
           getCompany();
+
+          showToast.success('¡Guardado correctamente!', {
+            duration: 4000,
+            progress: false,
+            position: "top-left",
+            transition: "popUp",
+            icon: '',
+            sound: false,
+          });
+        
         } else {
             const errorData = await response.json();
             console.error('Error al enviar el formulario:', errorData.error);
@@ -247,13 +258,14 @@ export default function CompanyPage() {
                                 <CardDescription>Configure las formas en que sus clientes pueden contactarlo.</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
+
                                 <div className="space-y-2">
                                     <Label htmlFor="phone">Teléfono</Label>
                                     <Input
-                                    id="phone"
-                                    placeholder="+34 123 456 789"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
+                                        id="phone"
+                                        placeholder="+34 123 456 789"
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value)}
                                     />
                                 </div>
 
