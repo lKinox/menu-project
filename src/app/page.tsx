@@ -234,22 +234,29 @@ export default function LandingPage() {
       if (isAdding) return; // Evitar operaciones si ya se está añadiendo
       setIsAdding(true);
       
-      setCartItems(prevItems => {
-        const existingItemIndex = prevItems.findIndex(item => item.product.id === product.id);
-        
+      setCartItems(prevCartItems => {
+        const existingItemIndex = prevCartItems.findIndex(item => item.product.id === product.id);
+    
+        console.log(existingItemIndex);
+    
+        let updatedItems = [...prevCartItems]; // Crear una copia del carrito anterior
+    
         if (existingItemIndex >= 0) {
-          const updatedItems = [...prevItems];
+          // Si el producto ya existe en el carrito, incrementa la cantidad
           updatedItems[existingItemIndex].quantity += quantity;
-          saveCartToCookie(updatedItems);
-          return updatedItems;
         } else {
-          return [...prevItems, { product, quantity }];
+          // Si el producto no existe en el carrito, agrégalo como un nuevo item
+          updatedItems = [...prevCartItems, { product, quantity }];
         }
+    
+        saveCartToCookie(updatedItems); // Guardar en la cookie después de actualizar el estado
+        setIsAdding(false);
+        return updatedItems;
       });
     
       showToast.success(`${product.name} añadido al carrito`, {
         duration: 4000,
-        progress: true,
+        progress: false,
         position: "top-left",
         transition: "popUp",
         icon: '',
@@ -316,6 +323,7 @@ export default function LandingPage() {
     const saveCartToCookie = (cartItems: CartItem[]) => {
       try {
         const cartItemsString = JSON.stringify(cartItems);
+        console.log(cartItems, cartItemsString)
         Cookies.set('cartItems', cartItemsString, { expires: 1 }); // Guarda la cookie por 7 días
         console.log('Carrito guardado en la cookie:', cartItems);
       } catch (error) {
@@ -357,9 +365,8 @@ export default function LandingPage() {
         <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
               <SheetTrigger asChild>
               <Button
-                variant="outline"
                 size="icon"
-                className="fixed bottom-5 right-5 z-50 px-10 py-5 text-lg" // Aumentar padding y texto
+                className="fixed bottom-5 right-5 z-50 px-10 py-5 text-lg border bg-amber-600" // Aumentar padding y texto
               >
                 <ShoppingBag /> {/* Aumentar el tamaño del icono */}
                 {cartItemCount > 0 && (
@@ -463,7 +470,21 @@ export default function LandingPage() {
                           className="w-full"
                           onClick={() => sentMessage(cartItems)}  
                         >
-                          Proceder al pago
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="lucide lucide-message-circle"
+                          >
+                            <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+                          </svg>
+                          Escribir al Whatsapp
                         </Button>
                         <Button 
                           variant="outline" 
@@ -774,7 +795,7 @@ export default function LandingPage() {
                     >
                       <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
                     </svg>
-                    Escribir al whatsapp
+                    Escribir al Whatsapp
                   </Button>
                   <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)} className="flex-1 cursor-pointer"> {/* Añadir flex-1 aquí */}
                     Cerrar
