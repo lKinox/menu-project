@@ -2,4 +2,3 @@ name = "demo-menu-project"
 compatibility_date = "2025-04-24"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = ".vercel/output/static"
-node_version = ">=20.0.0"
