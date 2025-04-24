@@ -1,4 +1,7 @@
-name = "demo-menu-project"
-compatibility_date = "2025-04-24"
-compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = ".vercel/output/static"
+  main = ".open-next/worker.js"
+  name = "demo-menu-project"
+  compatibility_date = "2025-03-25"
+  compatibility_flags = ["nodejs_compat"]
+  [assets]
+  directory = ".open-next/assets"
+  binding = "ASSETS"
