@@ -56,6 +56,11 @@ type CartItem = {
   quantity: number
 }
 
+type cookieItem = {
+  id: number
+  quantity: number
+}
+
 export default function LandingPage() {
   const [products, setProducts] = useState<Product[]>([]); // Estado para almacenar los productos
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -158,19 +163,6 @@ export default function LandingPage() {
   };
 
   useEffect(() => {
-    // Cargar el carrito desde la cookie al montar el componente
-    const storedCart = Cookies.get('cartItems');
-    if (storedCart) {
-      try {
-        const parsedCart = JSON.parse(storedCart) as CartItem[];
-        setCartItems(parsedCart);
-      } catch (error) {
-        Cookies.remove('cartItems');
-      }
-    }
-  }, []);
-
-  useEffect(() => {
     if (selectedCategory !== 'Todas') {
       const foundCategory = categories.find((cat) => cat.id === selectedCategory);
       setCategoryName(foundCategory ? foundCategory.name : '');
@@ -244,9 +236,11 @@ export default function LandingPage() {
         if (existingItemIndex >= 0) {
           // Si el producto ya existe en el carrito, incrementa la cantidad
           updatedItems[existingItemIndex].quantity += quantity;
+          console.log("Producto existente en el carrito", updatedItems)
         } else {
           // Si el producto no existe en el carrito, agrégalo como un nuevo item
           updatedItems = [...prevCartItems, { product, quantity }];
+          console.log("Producto no existente en el carrito", updatedItems)
         }
     
         saveCartToCookie(updatedItems); // Guardar en la cookie después de actualizar el estado
@@ -322,14 +316,52 @@ export default function LandingPage() {
 
     const saveCartToCookie = (cartItems: CartItem[]) => {
       try {
-        const cartItemsString = JSON.stringify(cartItems);
-        console.log(cartItems, cartItemsString)
-        Cookies.set('cartItems', cartItemsString, { expires: 1 }); // Guarda la cookie por 7 días
-        console.log('Carrito guardado en la cookie:', cartItems);
+        // Mapear los elementos del carrito para guardar solo id y quantity
+        const cartData = cartItems.map(item => ({
+          id: item.product.id,
+          quantity: item.quantity
+        }));
+        
+        // Convertir a cadena JSON para almacenar en la cookie
+        const cartItemsString = JSON.stringify(cartData);
+        Cookies.set('cartItems', cartItemsString, { expires: 7 }); // Guarda la cookie por 7 días
+        console.log('Carrito guardado en la cookie:', cartData);
       } catch (error) {
         console.error('Error al guardar el carrito en la cookie:', error);
       }
     };
+
+    useEffect(() => {
+      if (isLoaded) { // Solo se ejecuta este useEffect después de que los productos se han cargado
+        const storedCart = Cookies.get('cartItems');
+        if (storedCart) {
+          try {
+            const parsedCart: cookieItem[] = JSON.parse(storedCart);
+            console.log('Listado de productos cargados:', products);
+            
+            const fullCartDetails = parsedCart.map(value => {
+              console.log(value.id);
+              const product = products.find(p => p.id === value.id); // Accede al id del producto
+  
+              console.log(product);
+              if (product) {
+                return {
+                  product,
+                  quantity: value.quantity,
+                };
+              }
+              return null; // Manejo en caso de que el producto no se encuentre
+            }).filter(item => item !== null) as { product: Product; quantity: number }[]; // Filtra los elementos nulos
+  
+            console.log('Carrito cargado desde la cookie:', fullCartDetails);
+            setCartItems(fullCartDetails); // Establecer cartItems con la estructura correcta
+          } catch (error) {
+            console.error('Error al parsear el carrito de la cookie:', error);
+            Cookies.remove('cartItems'); // Limpiar cookies en caso de error
+          }
+        }
+      }
+    }, [isLoaded, products]);
 
     if (!isLoaded) {
       // Aquí puedes renderizar tu vista previa (skeleton, spinner, texto, etc.)
