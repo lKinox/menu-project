@@ -45,7 +45,6 @@
     "wrangler": "^4.13.1"
   },
   "devDependencies": {
-    "@opennextjs/cloudflare": "^1.0.0-beta.2",
     "@tailwindcss/postcss": "^4",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/multer": "^1.4.12",
