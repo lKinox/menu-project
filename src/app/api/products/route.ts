@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { insertProduct, getAllProducts } from '@/app/lib/db';
 import { put } from '@vercel/blob';
-  
+
 export async function POST(req: Request) {
     const formData = await req.formData();
     
