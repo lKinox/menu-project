@@ -1,8 +1,6 @@
 // dashboard/product/page.tsx
 "use client"
 
-export const runtime = 'edge'
-
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Upload } from "lucide-react"
