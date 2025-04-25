@@ -39,6 +39,7 @@ function initRuntime() {
       if (init2) {
         delete init2.cache;
         Object.defineProperty(init2, "body", {
+          // @ts-ignore
           value: init2.body instanceof stream.Readable ? ReadableStream.from(init2.body) : init2.body
         });
       }
@@ -47,7 +48,7 @@ function initRuntime() {
   };
   Object.assign(globalThis, {
     Request: CustomRequest,
-    __BUILD_TIMESTAMP_MS__: 1745543140456,
+    __BUILD_TIMESTAMP_MS__: 1745548297734,
     __NEXT_BASE_PATH__: ""
   });
 }
