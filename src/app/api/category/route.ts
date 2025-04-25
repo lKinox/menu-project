@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCategory, postCategory } from '@/app/lib/db';
 
+
 export async function GET() {
     try {
       const categories = await getCategory();

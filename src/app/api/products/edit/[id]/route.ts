@@ -1,5 +1,3 @@
-
-
 import { NextResponse, NextRequest } from 'next/server'
 import { getIdProduct, putIdProduct, deleteProductById } from '@/app/lib/db';
 import { put } from '@vercel/blob';
@@ -18,6 +16,7 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
   const avaible = formData.get('avaible') as string;
   const category_id = parseFloat(formData.get('category_id') as string);
   const id = await params.id; // Asegúrate de obtener el ID correctamente (ya es una promesa resuelta aquí)
+  
 
   let newImgUrl: string | null = null;
   let avaible_value: number;
