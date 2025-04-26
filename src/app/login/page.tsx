@@ -19,7 +19,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
-    email: "",
+    user: "",
     password: "",
     rememberMe: false,
   })
@@ -48,7 +48,7 @@ export default function LoginPage() {
   
     try {
       // Validación básica
-      if (!formData.email || !formData.password) {
+      if (!formData.user || !formData.password) {
         throw new Error("Por favor, complete todos los campos");
       }
   
@@ -57,7 +57,7 @@ export default function LoginPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: formData.email, password: formData.password }),
+        body: JSON.stringify({ user: formData.user, password: formData.password }),
       });
   
       if (!res.ok) {
@@ -106,16 +106,16 @@ export default function LoginPage() {
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Correo electrónico</Label>
+                <Label htmlFor="user">Usuario</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
                   <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="nombre@ejemplo.com"
+                    id="user"
+                    name="user"
+                    type="user"
+                    placeholder="Usuario"
                     className="pl-10"
-                    value={formData.email}
+                    value={formData.user}
                     onChange={handleInputChange}
                     disabled={isLoading}
                     required

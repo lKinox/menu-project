@@ -13,18 +13,18 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
   const price = parseFloat(formData.get('price') as string);
   const price_discount = parseFloat(formData.get('price_discount') as string);
   const imgData = formData.get('img');
-  const avaible = formData.get('avaible') as string;
-  const category_id = parseFloat(formData.get('category_id') as string);
+  const available = formData.get('available') as string;
+  const category_id = formData.get('category_id') as string;
   const id = await params.id; // Asegúrate de obtener el ID correctamente (ya es una promesa resuelta aquí)
   
 
   let newImgUrl: string | null = null;
-  let avaible_value: number;
+  let available_value: number;
 
-  if (avaible === "true") {
-    avaible_value = 1;
+  if (available === "true") {
+    available_value = 1;
   } else {
-    avaible_value = 0;
+    available_value = 0;
   }
 
   try {
@@ -36,10 +36,10 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
         addRandomSuffix: true,
       });
       newImgUrl = blob.url;
-      await putIdProduct(name, description, price, price_discount, newImgUrl, avaible_value, category_id, id);
+      await putIdProduct(name, description, price, price_discount, newImgUrl, available_value, category_id, id);
     } else if (typeof imgData === 'string' && imgData) {
       // Si imgData es una cadena no vacía, usa la URL existente
-      await putIdProduct(name, description, price, price_discount, imgData as string, avaible_value, category_id, id);
+      await putIdProduct(name, description, price, price_discount, imgData as string, available_value, category_id, id);
     }
 
     return NextResponse.json({ message: 'Producto actualizado con éxito' }, { status: 200 });

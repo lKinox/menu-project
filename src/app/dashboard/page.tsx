@@ -48,11 +48,12 @@ export default function DashboardPage() {
   const fetchProducts = async () => {
     try {
       const response = await fetch('/api/products'); // Llama a tu API
+      console.log(response)
       if (response.ok) {
         const data: Product[] = await response.json();
         setProducts(data); // Actualiza el estado con los datos obtenidos
       } else {
-        console.error('Error al obtener productos:', response.statusText);
+        console.error('Error al obtener productos:', response);
       }
     } catch (error) {
       console.error('Error en la solicitud:', error);

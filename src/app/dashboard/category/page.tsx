@@ -28,7 +28,7 @@ import {
 import { showToast } from "nextjs-toast-notify";
 
 interface Category {
-    id: number;
+    id: string;
     name: string;
 }
 
@@ -108,7 +108,7 @@ export default function CategoryPage() {
         }
     };
 
-    const deleteCategory = async (id: number) => {
+    const deleteCategory = async (id: string) => {
         try {
             const response = await fetch(`/api/category/${id}`, {
                 method: 'DELETE',

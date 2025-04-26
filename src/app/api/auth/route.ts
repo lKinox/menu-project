@@ -8,18 +8,18 @@ dotenv.config();
 
 // Configuración de seguridad - usa un paquete como 'bcrypt' para gestionar contraseñas
 export async function POST(req: NextRequest) {
-  const { email, password } = await req.json();
+  const { user, password } = await req.json();
   const jwtSecret = process.env.JWT_SECRET
 
   try {
-    const [rows]: any = await getUser(email);
-    const user = rows[0];
+    const [rows]: any = await getUser(user);
+    const user_select = rows[0];
 
-    if (!user) {
+    if (!user_select) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
-    const passwordMatches = await bcrypt.compare(password, user.password);
+    const passwordMatches = await bcrypt.compare(password, user_select.password);
     if (!passwordMatches) {
       return NextResponse.json({ error: 'Contraseña incorrecta' }, { status: 401 });
     }
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Generar un JWT para la cookie de sesión
-    const token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '24h' });
+    const token = jwt.sign({ userId: user_select.id }, jwtSecret, { expiresIn: '24h' });
 
     const response = NextResponse.json({ message: 'Inicio de sesión exitoso' });
     response.cookies.set('session', token, {

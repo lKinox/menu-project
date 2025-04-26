@@ -24,7 +24,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 
 interface Category {
-  id: number;
+  id: string;
   name: string;
 }
 
@@ -39,9 +39,9 @@ const ProductForm: React.FC = () => {
   const [price_discount, setPriceDiscount] = useState<number | string>('');
   const [img, setImg] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isAvaible, setIsAvaible] = useState<boolean>(false);
+  const [isAvailable, setIsAvailable] = useState<boolean>(false);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<number | string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -54,6 +54,8 @@ const ProductForm: React.FC = () => {
         
           if (products.length > 0) { // Verifica que hay al menos un producto en el array
             const product = products[0]; // Obtén el primer producto del array
+
+            console.log(product)
         
             setName(product.name);
             setDescription(product.description);
@@ -61,10 +63,9 @@ const ProductForm: React.FC = () => {
             setPriceDiscount(product.price_discount);
             setImg(product.img);
             setImagePreview(product.img); // Ruta de la imagen, ajusta según tu lógica
-            setIsAvaible(Boolean(product.avaible)); // Ruta de la imagen, ajusta según tu lógica
+            setIsAvailable(Boolean(product.available)); // Ruta de la imagen, ajusta según tu lógica
             setSelectedCategory(product.category_id); // Ruta de la imagen, ajusta según tu lógica
-        
-            console.log(name, description, price, price_discount, img); // Esto ahora debería deber deber reflejar los nuevos valores
+      
           } else {
             console.error('No se encontraron productos.');
           }
@@ -91,8 +92,10 @@ const ProductForm: React.FC = () => {
     formData.append('description', description);
     formData.append('price', String(price));
     formData.append('price_discount', String(price_discount));
-    formData.append('avaible', String(isAvaible));
+    formData.append('available', String(isAvailable));
     formData.append('category_id', String(selectedCategory));
+
+    console.log(isAvailable)
 
     if (img) {
       formData.append('img', img);
@@ -151,8 +154,8 @@ const ProductForm: React.FC = () => {
     }
   };
 
-  const handleAvaibleChange = (checked: boolean) => {
-    setIsAvaible(checked);
+  const handleAvailableChange = (checked: boolean) => {
+    setIsAvailable(checked);
   };
 
   const fetchCategory = async () => {
@@ -231,7 +234,7 @@ const ProductForm: React.FC = () => {
                               Categoría: 
                               <Asterisk className="mr-1 h-3 w-4" color="#ff0000"/>
                             </Label>
-                            <Select value={selectedCategory !== null ? String(selectedCategory) : undefined} onValueChange={(value) => setSelectedCategory(Number(value))}> 
+                            <Select value={selectedCategory !== null ? String(selectedCategory) : undefined} onValueChange={(value) => setSelectedCategory(String(value))}> 
                               <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Seleccione una categoría" />
                               </SelectTrigger>
@@ -319,13 +322,13 @@ const ProductForm: React.FC = () => {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="avaible">
+                            <Label htmlFor="available">
                               Disponible:  
                             </Label>
                             <Switch
-                              id="avaible"
-                              checked={isAvaible}
-                              onCheckedChange={handleAvaibleChange}
+                              id="available"
+                              checked={isAvailable}
+                              onCheckedChange={handleAvailableChange}
                             />
                         </div>
                         <div className="flex justify-end gap-3 pt-4">

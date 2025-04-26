@@ -47,6 +47,8 @@ export default function CompanyPage() {
           if (response.ok) {
               const companies = await response.json(); // Esto es un array de productos
 
+              console.log(companies)
+
               if (companies.length > 0) {
                 const company = companies[0]; // Accede al primer elemento
 

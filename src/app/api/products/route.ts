@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const description = formData.get('description') as string;
     const price = parseFloat(formData.get('price') as string);
     const price_discount = parseFloat(formData.get('price_discount') as string);
-    const category_id = parseFloat(formData.get('category_id') as string);
+    const category_id = formData.get('category_id') as string;
     const file = formData.get('img') as File;
   
     try {

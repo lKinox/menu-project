@@ -37,7 +37,7 @@ const ProductForm: React.FC = () => {
   const [img, setImg] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +74,7 @@ const ProductForm: React.FC = () => {
         setPriceDiscount('');
         setImg(null);
         setImagePreview(null); // Limpiar la vista previa
-        setSelectedCategory(null); // Limpiar la categoría seleccionada
+        setSelectedCategory(''); // Limpiar la categoría seleccionada
 
         showToast.success('¡Producto creado correctamente!', {
           duration: 4000,
@@ -186,7 +186,7 @@ const ProductForm: React.FC = () => {
                               Categoría: 
                               <Asterisk className="mr-1 h-3 w-4" color="#ff0000"/>
                             </Label>
-                            <Select onValueChange={(value) => setSelectedCategory(Number(value))}>
+                            <Select onValueChange={(value) => setSelectedCategory(String(value))}>
                               <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Seleccione una categoría" />
                               </SelectTrigger>

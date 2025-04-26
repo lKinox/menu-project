@@ -28,7 +28,7 @@ interface Product {
   price: number;
   price_discount: number;
   img: string; // Suponemos que img almacena el ID del producto
-  avaible: number;
+  available: number;
   category_id: number;
 }
 
@@ -96,7 +96,9 @@ export default function LandingPage() {
         const data: Product[] = await response.json();
   
         // Filtrar los productos para incluir solo los que están disponibles
-        const availableProducts = data.filter(product => product.avaible);
+        const availableProducts = data.filter(product => product.available === 1);
+
+        console.log(availableProducts)
   
         setProducts(availableProducts); // Actualiza el estado con los productos disponibles
       } else {
