@@ -76,7 +76,7 @@ const createCompanyTable = async () => {
   const uniqueId = uuidv4();
 
   // Verificar si hay filas en la tabla
-  const [rows]: any = await pool.execute('SELECT COUNT(*) AS count FROM company');
+  const [rows]: any = await pool.execute('SELECT COUNT(*) AS count FROM company WHERE client_id = ?', [client_id]);
 
   // Solo inserta si la tabla está vacía
   if (rows[0].count === 0) {
