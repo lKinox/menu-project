@@ -159,12 +159,12 @@ export const insertProduct = async (name: string, description: string, price: nu
 // Función para obtener todos los productos
 export const getAllProducts = async () => {
   await createTable();
-  const [rows] = await pool.execute('SELECT * FROM products');
+  const [rows] = await pool.execute('SELECT * FROM products WHERE client_id = ?', [client_id]);
   return rows;
 };
 
 export const getIdProduct = async (id: string) => {
-  const [rows] = await pool.execute('SELECT * FROM products WHERE id = ?', [id]);
+  const [rows] = await pool.execute('SELECT * FROM products WHERE id = ? and client_id = ?', [id, client_id]);
   return rows;
 };
 
@@ -184,14 +184,14 @@ export const deleteProductById = async (id: string) => {
 
 export const getUser = async (user: string) => {
   await createUsersTable();
-  const [result] = await pool.execute('SELECT * FROM users WHERE user = ?', [user]);
+  const [result] = await pool.execute('SELECT * FROM users WHERE user = ? and client_id = ?', [user, client_id]);
   // Puedes optar por verificar el número de filas afectadas si es necesario
   return [result]; // Esto devolverá el resultado de la operación
 };
 
 export const getCategory = async () => {
   await createCategoryTable()
-  const [rows] = await pool.execute('SELECT * FROM category');
+  const [rows] = await pool.execute('SELECT * FROM category WHERE client_id = ?', [client_id]);
   return rows;
 };
 

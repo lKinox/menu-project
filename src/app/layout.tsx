@@ -15,6 +15,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Menu App",
   description: "Menu App Project",
+  icons: {
+    icon: '/favicon.ico', // Path to your favicon.ico
+    apple: '/apple-touch-icon.png', // Path to an Apple touch icon
+  },
 };
 
 export default function RootLayout({
