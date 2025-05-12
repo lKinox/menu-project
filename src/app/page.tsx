@@ -498,7 +498,7 @@ export default function LandingPage() {
                       <div className="space-y-4">
                         <div className="flex justify-between font-medium">
                           <span>Total</span>
-                          <span>€{cartTotal.toFixed(2)}</span>
+                          <span>${cartTotal.toFixed(2)}</span>
                         </div>
                         <Button 
                           className="w-full"
