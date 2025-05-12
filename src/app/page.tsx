@@ -758,8 +758,8 @@ export default function LandingPage() {
           <div className="mt-12 border-t border-slate-800 pt-8 text-center text-sm text-slate-400">
             <p>© {new Date().getFullYear()} {companyName}. Todos los derechos reservados.</p>
             <p className="mt-6">Desarrollado por 
-                <Link href="https://reyanj.netlify.app/" target="_blank" className="text-white pl-[5]">
-                  Reyan J.
+                <Link href="https://www.visualisto.com/" target="_blank" className="text-white pl-[5]">
+                  Visualisto ♥️
                 </Link>
             </p>
           </div>
