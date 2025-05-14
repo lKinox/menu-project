@@ -649,7 +649,7 @@ export default function LandingPage() {
                           handleDetailsProduct(product); // Llama a la función pasando el producto actual.
                         }}
                       >
-                        Ver Detalles
+                        Detalles
                       </Link>
                     </div>
                   </div>
