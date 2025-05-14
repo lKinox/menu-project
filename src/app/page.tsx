@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+import NumberFlow from '@number-flow/react'
 import {
   Dialog,
   DialogContent,
@@ -478,13 +478,29 @@ export default function LandingPage() {
                                 <div className="text-sm font-medium">
                                   {item.product.price_discount > 0 ? (
                                     <>
-                                      <span>${item.product.price_discount}</span>
-                                      <span className="ml-1 text-xs text-red-500 line-through">
-                                        ${item.product.price}
+                                      <span>
+                                        $
+                                        <NumberFlow 
+                                          value={ parseFloat((item.product.price_discount * item.quantity).toFixed(2)) } 
+                                          format={{ style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }} 
+                                        />
+                                      </span>
+                                      <span className="ml-1 text-xs text-red-500 !line-through">
+                                        $
+                                        <NumberFlow 
+                                          value={ parseFloat((item.product.price * item.quantity).toFixed(2)) } 
+                                          format={{ style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }} 
+                                        />
                                       </span>
                                     </>
                                   ) : (
-                                    <span>${item.product.price}</span>
+                                    <span>
+                                      $
+                                      <NumberFlow 
+                                        value={ parseFloat((item.product.price * item.quantity).toFixed(2)) } 
+                                        format={{ style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }} 
+                                      />
+                                    </span>
                                   )}
                                 </div>
                               </div>
@@ -498,7 +514,9 @@ export default function LandingPage() {
                       <div className="space-y-4">
                         <div className="flex justify-between font-medium">
                           <span>Total</span>
-                          <span>${cartTotal.toFixed(2)}</span>
+                          <span>
+                            $<NumberFlow value={parseFloat(cartTotal.toFixed(2))} format={{ style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }}/>
+                          </span>
                         </div>
                         <Button 
                           className="w-full"
