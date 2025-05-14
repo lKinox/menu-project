@@ -635,10 +635,11 @@ export default function LandingPage() {
                         disabled={isAdding}
                         size="icon"
                         variant="outline"
-                        className="h-8 w-8"
+                        className="h-8 w-24"
                         title="Añadir al carrito"
                       >
                         <ShoppingCart className="h-4 w-4" />
+                        Comprar
                       </Button>
                       <Link
                         href="#"
